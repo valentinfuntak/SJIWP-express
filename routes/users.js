@@ -3,7 +3,7 @@ var router = express.Router();
 var Joi = require("joi");
 
 router.get('/signin', function (req, res, next) {
-  res.render('users/signin', { status: { Display_form :true , error: false } });
+  res.render('users/signin', { status: { display_form: true, error: false } });
 });
 
 const schema_signin = Joi.object({
@@ -15,14 +15,12 @@ router.post('/signin', function (req, res, next) {
   const data = req.body;
 
   const validation = schema_signin.validate(data);
+  console.log("Validation", validation);
   if (validation.error) {
-    //dogodila se greška u podacima
-
-    res.render('users/signin', { status: { Sumbit_form :true, error: true } });
-  }
-  else{
-    //TODO: Prijava korisnika
-    res.render('users/signin', { status: {  Sumbit_form: true, error: false } });
+    res.render('users/signin', { status: { submit_form: true, error: true } });
+  } else {
+    // TODO: prijava korisnika
+    res.render('users/signin', { status: { submit_form: true, error: false } });
   }
 });
 
