@@ -1,14 +1,14 @@
-const JWT_SECRET_KEY = "ww0gtIRVJLtkJLRHvBkspdMsRzmojOf1wiiocyDBU1L0Kd2A4Mf1pzx7tp6EmuQ4lODFS4uwHv40Lvm4u37KBB6iHyAFycXQPbSWe6yKJqp8rEADhv9VGOzGKYIfOhCu";
+const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
-const jwt = require ("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
-function getUserToket(id, email, name, role, expDays = 7){
+function getUserToken(id, email, name, role, expDays = 7) {
     const tokenData = {
-        uid: id, 
+        uid: id,
         email: email,
         name: name,
         role: role,
-        time: Date.now() 
+        time: Date.now()
     };
 
     const tokenOptions = {
@@ -20,15 +20,28 @@ function getUserToket(id, email, name, role, expDays = 7){
     return token;
 }
 
-function checkAuthCookie(req, res, next){
-    const token = req.cookie["Auth"];
+function parseAuthCookie(req, res, next) {
+    const token = req.cookies[process.env.AUTH_COOKIE_KEY];
+    let result;
+    try {
+        result = jwt.verify(token, JWT_SECRET_KEY);
+    } catch (error) {
+        res.clearCookie(process.env.AUTH_COOKIE_KEY);
+        next();
+        return;
+    }
+    req.user = result;
+    res.locals.user = result;
+    next();
+}
 
-    const result = jwt.verify(token, JWT_SECRET_KEY);
-
-    console.log("TOKEN CHECK", result);
+function authRequired(req, res, next) {
+    if (!req.user) throw new Error("Potrebna je prijava u sustav");
+    next();
 }
 
 module.exports = {
     getUserToken,
-    checkAuthCookie
+    parseAuthCookie,
+    authRequired
 };
