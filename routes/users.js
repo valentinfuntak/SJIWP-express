@@ -2,18 +2,75 @@ const express = require("express");
 const router = express.Router();
 const Joi = require("joi");
 const { db } = require("../services/db.js");
-const { getUserToken, authRequired } = require("../services/auth.js");
+const { getUserToken, authRequired, checkEmailUnique } = require("../services/auth.js");
 const bcrypt = require("bcrypt");
 
 // GET /users/signout
-router.get("/signout", function (req, res, next) {
+router.get("/signout", authRequired, function (req, res, next) {
   res.clearCookie(process.env.AUTH_COOKIE_KEY);
   res.redirect("/");
 });
 
 // GET /users/data
 router.get("/data", authRequired, function (req, res, next) {
-  res.render("users/data");
+  res.render("users/data", { result: { display_form: true } });
+});
+
+// SCHEMA signup
+const schema_data = Joi.object({
+  name: Joi.string().min(3).max(50).required(),
+  email: Joi.string().email().max(50).required(),
+  password: Joi.string().min(3).max(50).allow(null, "")
+});
+
+// POST /users/data
+router.post("/data", authRequired, function (req, res, next) {
+  // do validation
+  const result = schema_data.validate(req.body);
+  if (result.error) {
+    console.log(result);
+    res.render("users/data", { result: { validation_error: true, display_form: true } });
+    return;
+  }
+
+  const newName = req.body.name;
+  const newEmail = req.body.email;
+  const newPassword = req.body.password;
+  const currentUser = req.user;
+
+  let emailChanged = false;
+  if (newEmail !== currentUser.email) {
+    if (!checkEmailUnique(newEmail)) {
+      res.render("users/data", { result: { email_not_unique: true, display_form: true } });
+      return;
+    }
+    emailChanged = true;
+  }
+  let nameChanged = false;
+  if (newName !== currentUser.name) {
+    nameChanged = true;
+  }
+  let passwordChanged = false;
+  let passwordHash;
+  if (newPassword && newPassword.length > 0) {
+    passwordHash = bcrypt.hashSync(newPassword, 10);
+    passwordChanged = true;
+  }
+
+  if (!emailChanged && !nameChanged && !passwordChanged) {
+    res.render("users/data", { result: { display_form: true } });
+  }
+
+  let query = "UPDATE users SET";
+  if (emailChanged) query += " email = ?,";
+  if (nameChanged) query += " name = ?,";
+  if (passwordChanged) query += " password = ?,";
+  query += query.slice(0, -1);
+  query += "WHERE  email = ?;"
+  dataChanged.push(currentUser.email);
+
+  const stmt = db.prepare(query);
+  const updateResult = stmt.run(dataChanged);
 });
 
 // GET /users/signin
@@ -80,6 +137,11 @@ router.post("/signup", function (req, res, next) {
   const result = schema_signup.validate(req.body);
   if (result.error) {
     res.render("users/signup", { result: { validation_error: true, display_form: true } });
+    return;
+  }
+
+  if (!checkEmailUnique(req.body.email)) {
+    res.render("users/signup", { result: { email_not_unique: true, display_form: true } });
     return;
   }
 

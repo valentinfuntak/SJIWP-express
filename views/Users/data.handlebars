@@ -1,11 +1,49 @@
-<div class="p-4 text-2xl flex flex-col gap-4">
-    <div>
-        <div class="text-orange-600">Ime i prezime:</div> {{user.name}}
+<div class="p-2">
+    {{#if result.display_form}}
+    <form method="post" action="/users/data" class="flex flex-col gap-2">
+        <div class="pb-2 flex flex-col">
+            <label>Ime i prezime</label>
+            <input type="text" name="name" value="{{user.name}}" class="bg-neutral" />
+        </div>
+        <div class="pb-2 flex flex-col">
+            <label>E-mail adresa</label>
+            <input type="email" name="email" value="{{user.email}}" class="bg-neutral" />
+        </div>
+        <div class="pb-2 flex flex-col">
+            <label>Zaporka</label>
+            <input type="password" name="password" class="bg-neutral" />
+        </div>
+        <div class="pb-2 flex gap-2">
+            <input type="submit" value="Potvrdi" class="flex-1 btn btn-primary" />
+            <input type="reset" value="Poništi" class="flex-1 btn btn-warning" />
+        </div>
+    </form>
+    {{/if}}
+
+    {{#if result.validation_error}}
+    <div class="mt-4">
+        <div class="card w-96 bg-error text-black">
+            <div class="card-body">
+                <h2 class="card-title">Greška!</h2>
+                <p>
+                    Dogodila se greška prilikom provjere podataka, provjerite svoj unos
+                    i pokušajte ponovno!
+                </p>
+            </div>
+        </div>
     </div>
-    <div>
-        <div class="text-orange-600">E-mail adresa:</div> {{user.email}}
+    {{/if}}
+
+    {{#if result.email_not_unique}}
+    <div class="mt-4">
+        <div class="card w-96 bg-error text-black">
+            <div class="card-body">
+                <h2 class="card-title">Greška!</h2>
+                <p>
+                    E-mail adresa koju ste unijeli je već u upotrebi!
+                </p>
+            </div>
+        </div>
     </div>
-    <div>
-        <div class="text-orange-600">Zaporka:</div> *********
-    </div>
+    {{/if}}
 </div>
