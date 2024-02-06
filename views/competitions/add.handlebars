@@ -1,17 +1,20 @@
 <div class="p-2">
+
     {{#if result.display_form}}
-    <form method="post" action="/users/data" class="flex flex-col gap-2">
+    <div class="text-xl pb-2 font-bold text-primary">Novo natjecanje</div>
+
+    <form method="post" action="/competitions/add" class="flex flex-col gap-2">
         <div class="pb-2 flex flex-col">
-            <label>Ime i prezime</label>
-            <input type="text" name="name" value="{{user.name}}" class="bg-neutral" />
+            <label>Naziv</label>
+            <input type="text" name="name" class="bg-neutral" required="" minlength="3" maxlength="50" />
         </div>
         <div class="pb-2 flex flex-col">
-            <label>E-mail adresa</label>
-            <input type="email" name="email" value="{{user.email}}" class="bg-neutral" />
+            <label>Opis</label>
+            <textarea name="description" rows="10" class="bg-neutral" required="" minlength="3"></textarea>
         </div>
         <div class="pb-2 flex flex-col">
-            <label>Zaporka</label>
-            <input type="password" name="password" class="bg-neutral" />
+            <label>Rok prijave</label>
+            <input type="datetime-local" name="apply_till" class="bg-neutral" required="" />
         </div>
         {{> form_buttons }}
     </form>
@@ -19,10 +22,6 @@
 
     {{#if result.validation_error}}
     {{> validation_error}}
-    {{/if}}
-
-    {{#if result.email_not_unique}}
-    {{> email_not_unique}}
     {{/if}}
 
     {{#if result.database_error}}
@@ -35,17 +34,13 @@
             <div class="card-body">
                 <h2 class="card-title">Uspjeh!</h2>
                 <p>
-                    Uspješno ste promijenili svoje podatke, sada ćemo vas odjaviti!
+                    Uspješno ste dodali novo natjecanje!
                 </p>
                 <div class="card-actions justify-end">
+                    <a class="btn" href="/competitions">Nastavi na prikaz natjecanja</a>
                 </div>
             </div>
         </div>
-        <script>
-            setTimeout(() => {
-                window.location = "/users/signout";
-            }, 3000);
-        </script>
     </div>
     {{/if}}
 </div>

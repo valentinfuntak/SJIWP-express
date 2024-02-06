@@ -28,7 +28,6 @@ router.post("/data", authRequired, function (req, res, next) {
   // do validation
   const result = schema_data.validate(req.body);
   if (result.error) {
-    console.log(result);
     res.render("users/data", { result: { validation_error: true, display_form: true } });
     return;
   }
@@ -38,6 +37,8 @@ router.post("/data", authRequired, function (req, res, next) {
   const newPassword = req.body.password;
   const currentUser = req.user;
 
+  let dataChanged = [];
+
   let emailChanged = false;
   if (newEmail !== currentUser.email) {
     if (!checkEmailUnique(newEmail)) {
@@ -45,16 +46,21 @@ router.post("/data", authRequired, function (req, res, next) {
       return;
     }
     emailChanged = true;
+    dataChanged.push(newEmail);
   }
+
   let nameChanged = false;
   if (newName !== currentUser.name) {
     nameChanged = true;
+    dataChanged.push(newName);
   }
+
   let passwordChanged = false;
   let passwordHash;
   if (newPassword && newPassword.length > 0) {
     passwordHash = bcrypt.hashSync(newPassword, 10);
     passwordChanged = true;
+    dataChanged.push(passwordHash);
   }
 
   if (!emailChanged && !nameChanged && !passwordChanged) {
@@ -65,12 +71,18 @@ router.post("/data", authRequired, function (req, res, next) {
   if (emailChanged) query += " email = ?,";
   if (nameChanged) query += " name = ?,";
   if (passwordChanged) query += " password = ?,";
-  query += query.slice(0, -1);
-  query += "WHERE  email = ?;"
+  query = query.slice(0, -1);
+  query += " WHERE email = ?;";
   dataChanged.push(currentUser.email);
 
   const stmt = db.prepare(query);
   const updateResult = stmt.run(dataChanged);
+
+  if (updateResult.changes && updateResult.changes === 1) {
+    res.render("users/data", { result: { success: true } });
+  } else {
+    res.render("users/data", { result: { database_error: true } });
+  }
 });
 
 // GET /users/signin
@@ -114,8 +126,6 @@ router.post("/signin", function (req, res, next) {
   } else {
     res.render("users/signin", { result: { invalid_credentials: true } });
   }
-
-
 });
 
 // GET /users/signup
