@@ -49,15 +49,15 @@
             {{/if}}
 
             {{#if result.validation_error}}
-            {{> validation_error}}
-            {{/if}}
-
-            {{#if result.email_not_unique}}
-            {{> email_not_unique}}
+            {{> validation_error }}
             {{/if}}
 
             {{#if result.database_error}}
-            {{> database_error}}
+            {{> database_error }}
+            {{/if}}
+
+            {{#if result.email_in_use}}
+            {{> email_in_use }}
             {{/if}}
 
             {{#if result.success}}
@@ -69,7 +69,7 @@
                             Uspješno ste se registrirali, možete nastaviti s radom!
                         </p>
                         <div class="card-actions justify-end">
-                            <a class="btn" href="/">Nastavi na naslovnicu</a>
+                            <a class="btn" href="/users/signin">Nastavi na prijavu</a>
                         </div>
                     </div>
                 </div>

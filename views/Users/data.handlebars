@@ -18,11 +18,11 @@
     {{/if}}
 
     {{#if result.validation_error}}
-    {{> validation_error}}
+    {{> validation_error }}
     {{/if}}
 
-    {{#if result.email_not_unique}}
-    {{> email_not_unique}}
+    {{#if result.email_in_use}}
+    {{> email_in_use}}
     {{/if}}
 
     {{#if result.database_error}}
@@ -35,7 +35,7 @@
             <div class="card-body">
                 <h2 class="card-title">Uspjeh!</h2>
                 <p>
-                    Uspješno ste promijenili svoje podatke, sada ćemo vas odjaviti!
+                    Uspješno ste promijenili podatke, sada ćemo vas odjaviti!
                 </p>
                 <div class="card-actions justify-end">
                 </div>

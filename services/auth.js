@@ -3,7 +3,7 @@ const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 const jwt = require("jsonwebtoken");
 const { db } = require("./db.js");
 
-function getUserToken(id, email, name, role, expDays = 7) {
+function getUserJwt(id, email, name, role, expDays = 7) {
     const tokenData = {
         sub: id,
         email: email,
@@ -21,13 +21,13 @@ function getUserToken(id, email, name, role, expDays = 7) {
     return token;
 }
 
+// MIDDLEWARE FOR PARSING AUTH COOKIE
 function parseAuthCookie(req, res, next) {
     const token = req.cookies[process.env.AUTH_COOKIE_KEY];
-    let result;
+    let result = null;
     try {
         result = jwt.verify(token, JWT_SECRET_KEY);
     } catch (error) {
-        res.clearCookie(process.env.AUTH_COOKIE_KEY);
         next();
         return;
     }
@@ -37,11 +37,13 @@ function parseAuthCookie(req, res, next) {
     next();
 }
 
+// MIDDLEWARE FOR AUTHENTICATION CHECK
 function authRequired(req, res, next) {
     if (!req.user) throw new Error("Potrebna je prijava u sustav");
     next();
 }
 
+// MIDDLEWARE FOR ADMIN CHECK
 function adminRequired(req, res, next) {
     if (!req.user || req.user.role !== "admin") throw new Error("Dopušteno samo administratorima");
     next();
@@ -59,7 +61,7 @@ function checkEmailUnique(email) {
 }
 
 module.exports = {
-    getUserToken,
+    getUserJwt,
     parseAuthCookie,
     authRequired,
     checkEmailUnique,
