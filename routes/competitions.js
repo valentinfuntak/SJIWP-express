@@ -3,6 +3,7 @@ const router = express.Router();
 const { authRequired, adminRequired } = require("../services/auth.js");
 const Joi = require("joi");
 const { db } = require("../services/db.js");
+const { decode } = require("jsonwebtoken");
 
 // GET /competitions
 router.get("/", authRequired, function (req, res, next) {
@@ -17,7 +18,7 @@ router.get("/", authRequired, function (req, res, next) {
     res.render("competitions/index", { result: { items: result } });
 });
 
-// SCHEMA signup
+// SCHEMA id
 const schema_id = Joi.object({
     id: Joi.number().integer().positive().required()
 });
@@ -58,39 +59,12 @@ router.get("/edit/:id", adminRequired, function (req, res, next) {
     res.render("competitions/form", { result: { display_form: true, edit: selectResult } });
 });
 
-// SCHEMA edit
-const schema_edit = Joi.object({
-    id: Joi.number().integer().positive().required(),
-    name: Joi.string().min(3).max(50).required(),
-    description: Joi.string().min(3).max(1000).required(),
-    apply_till: Joi.date().iso().required()
-});
-
-// POST /competitions/edit
-router.post("/edit", authRequired, function (req, res, next) {
-    // do validation
-    const result = schema_edit.validate(req.body);
-    if (result.error) {
-        res.render("competitions/form", { result: { validation_error: true, display_form: true } });
-        return;
-    }
-
-    const stmt = db.prepare("UPDATE competitions SET name = ?, description = ?, apply_till = ? WHERE id = ?;");
-    const updateResult = stmt.run(req.body.name, req.body.description, req.body.apply_till, req.body.id);
-
-    if (updateResult.changes && updateResult.changes === 1) {
-        res.redirect("/competitions");
-    } else {
-        res.render("competitions/form", { result: { database_error: true } });
-    }
-});
-
 // GET /competitions/add
 router.get("/add", adminRequired, function (req, res, next) {
     res.render("competitions/form", { result: { display_form: true } });
 });
 
-// SCHEMA add
+// SCHEMA signup
 const schema_add = Joi.object({
     name: Joi.string().min(3).max(50).required(),
     description: Joi.string().min(3).max(1000).required(),
@@ -115,12 +89,47 @@ router.post("/add", adminRequired, function (req, res, next) {
         res.render("competitions/form", { result: { database_error: true } });
     }
 });
+// SCHEMA edit
+const schema_edit = Joi.object({
+    name: Joi.string().min(3).max(50).required(),
+    description: Joi.string().min(3).max(1000).required(),
+    apply_till: Joi.date().iso().required(),
+    id: Joi.number().integer().positive().required()
+});
+// POST /competitions/edit/
+router.post("/edit", adminRequired, function (req, res, next) {
+    // do validation
+    const result = schema_edit.validate(req.body);
+    if (result.error) {
+        res.render("competitions/form", { result: { validation_error: true, display_form: true } });
+        return;
+    }
+    const stmt = db.prepare("UPDATE competitions SET name = ?, description = ?, apply_till = ? WHERE id = ?;");
+    const updateResult = stmt.run(req.body.name, req.body.description, req.body.apply_till, req.body.id);
+    if (updateResult.changes && updateResult.changes === 1) {
+        res.redirect("/competitions");
+    } else {
+        res.render("competitions/form", { result: { database_error: true } });
+    }
+});
 
+// GET /competitions/signup
+router.get("/signup/:id", function (req, res, next) {
+    // do validation
+    const result = schema_id.validate(req.params);
+    if (result.error) {
+        throw new Error("Neispravan poziv");
+    }
+    const stmt = db.prepare("INSERT INTO ne dela (userid,competitionid) VALUES (?,?);")
+    const signUpResult = stmt.run(req.user.sub, req.params.id);
 
-// GET /competitions/signin
-router.get("/signin", function (req, res, next) {
-    res.render("competitions/apply", { result: { display_form: true } });
-  });
+    if (signUpResult.changes && signUpResult.changes === 1) {
+        res.render("competiitons/from", { result: { signedUp: true } });
+    } else {
+        res.render("competitions/form", { result: { database_error: true } });
+    }
+
+});
 
 
 module.exports = router;
