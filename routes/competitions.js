@@ -113,23 +113,18 @@ router.post("/edit", adminRequired, function (req, res, next) {
     }
 });
 
-// GET /competitions/signup
-router.get("/signup/:id", function (req, res, next) {
-    // do validation
-    const result = schema_id.validate(req.params);
-    if (result.error) {
-        throw new Error("Neispravan poziv");
-    }
-    const stmt = db.prepare("INSERT INTO ne dela (userid,competitionid) VALUES (?,?);")
-    const signUpResult = stmt.run(req.user.sub, req.params.id);
+// GET /competitions/applay
+router.get("/applay/:id", function (req, res, next) {
+    res.render("competitions/applay", { result: { display_form: true } });
+});
 
-    if (signUpResult.changes && signUpResult.changes === 1) {
-        res.render("competiitons/from", { result: { signedUp: true } });
-    } else {
-        res.render("competitions/form", { result: { database_error: true } });
-    }
+
+// POST /competitions/applay/
+router.post("/edit", function (req, res, next) {
 
 });
+
+
 
 
 module.exports = router;
