@@ -1,7 +1,7 @@
 <div class="hero min-h-screen bg-base-200">
     <div class="hero-content">
         <div class="max-w-md">
-            <form method="post" action="/users/applay">
+            <form method="post" action="/Users/applay">
                 <div>
                     <h1 class="text-5xl font-bold">Prijava na natjecanje</h1>
                 </div>
@@ -19,6 +19,13 @@
                                 <span class="label-text">Identifikacijska sifra</span>
                             </div>
                             <input type="text" name="ident_sifra" placeholder="Izmislite svoju identifikacijsku sifru"
+                                class="input input-bordered w-full max-w-xs" required="" />
+                        </label>
+                        <label class="form-control w-full max-w-xs">
+                            <div class="label">
+                                <span class="label-text">ID natjecanja</span>
+                            </div>
+                            <input type="text" name="idnat" placeholder="Unesite ID natjecanja"
                                 class="input input-bordered w-full max-w-xs" required="" />
                         </label>
                     </div>

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Joi = require("joi");
 const { db } = require("../services/db.js");
-const { getUserJwt, checkEmailUnique, authRequired, checkIdent_sifiraUnique} = require("../services/auth.js");
+const { getUserJwt, checkEmailUnique, authRequired, checkIdent_sifiraUnique, checkimeUnique} = require("../services/auth.js");
 const bcrypt = require("bcrypt");
 
 // GET /users/data
@@ -178,11 +178,11 @@ const schema_applay = Joi.object({
 router.post("/applay", function (req, res, next) {
   const result = schema_applay.validate(req.body);
   if (result.error) {
-    res.render("competitions/form", { result: { validation_error: true, display_form: false } });
+    res.render("competitions/forma_natjecanja", { result: { validation_error: true, display_form: false } });
     return;
   }
 
-  if (!checkIdent_sifiraUnique(req.body.ident_sifra)) {
+  if (!checkIdent_sifiraUnique &&(req.body.ident_sifra)) {
     res.render("competitions/forma_natjecanja", { result: { Identsifra_in_user: true, display_form: true } });
     return;
   }
