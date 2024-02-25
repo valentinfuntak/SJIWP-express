@@ -182,8 +182,8 @@ router.post("/applay", function (req, res, next) {
     return;
   }
 
-  if (!checkIdent_sifraUnique(req.body.ident_sifra)) {
-    res.render("users/applay", { result: { Identsifra_in_user: true, display_form: true } });
+  if (!checkIdent_sifiraUnique(req.body.ident_sifra)) {
+    res.render("competitions/forma_natjecanja", { result: { Identsifra_in_user: true, display_form: true } });
     return;
   }
 
@@ -192,16 +192,6 @@ router.post("/applay", function (req, res, next) {
 
   const stmt = db.prepare("INSERT INTO  Prijava (ime, ident_sifra) VALUES (?,?);");
   const insertResult = stmt.run(ime, ident_sifra);
-
-  if (insertResult.changes && insertResult.changes === 1) {
-    res.render("users/applay", { result: { success: true } });
-  } else {
-    res.render("users/applay", { result: { database_error: true } });
-  }
-
-  console.log("Rezultat upita:", insertResult);
-
-
 });
 
 
