@@ -59,11 +59,22 @@ function checkEmailUnique(email) {
         return true;
     }
 }
+function checkIdent_sifiraUnique(ident_sifra){
+    const stmt = db.prepare("SELECT count(*) FROM Prijava WHERE ident_sifra = ?;");
+    const result = stmt.get(ident_sifra);
+
+    if (result["count(*)"] >= 1) {
+        return false;
+    } else {
+        return true;
+    }
+}
 
 module.exports = {
     getUserJwt,
     parseAuthCookie,
     authRequired,
     checkEmailUnique,
+    checkIdent_sifiraUnique,
     adminRequired
 };

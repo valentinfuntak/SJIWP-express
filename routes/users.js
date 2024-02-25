@@ -2,14 +2,14 @@ const express = require("express");
 const router = express.Router();
 const Joi = require("joi");
 const { db } = require("../services/db.js");
-const { getUserJwt, checkEmailUnique, authRequired } = require("../services/auth.js");
+const { getUserJwt, checkEmailUnique, authRequired, checkIdent_sifiraUnique} = require("../services/auth.js");
 const bcrypt = require("bcrypt");
 
 // GET /users/data
 router.get("/data", authRequired, function (req, res, next) {
   res.render("users/data", { result: { display_form: true } });
 });
-
+//Schema data
 const schema_data = Joi.object({
   name: Joi.string().min(3).max(50).required(),
   email: Joi.string().email().max(50).required(),
@@ -152,7 +152,7 @@ router.post("/signup", function (req, res, next) {
   }
 
   if (!checkEmailUnique(req.body.email)) {
-    res.render("users/signup", { result: { email_in_use: true, display_form: true } });
+    res.render("users/signup", { result: {email_in_use: true, display_form: true } });
     return;
   }
 
@@ -167,5 +167,42 @@ router.post("/signup", function (req, res, next) {
   }
   return;
 });
+
+// SCHEMA applay
+const schema_applay = Joi.object({
+  ime: Joi.string().min(3).max(25).required(),
+  ident_sifra: Joi.string().min(6).max(6).required()
+});
+
+//POST /users/applay
+router.post("/applay", function (req, res, next) {
+  const result = schema_applay.validate(req.body);
+  if (result.error) {
+    res.render("competitions/form", { result: { validation_error: true, display_form: false } });
+    return;
+  }
+
+  if (!checkIdent_sifraUnique(req.body.ident_sifra)) {
+    res.render("users/applay", { result: { Identsifra_in_user: true, display_form: true } });
+    return;
+  }
+
+  const ime = req.body.ime;
+  const ident_sifra = req.body.ident_sifra;
+
+  const stmt = db.prepare("INSERT INTO  Prijava (ime, ident_sifra) VALUES (?,?);");
+  const insertResult = stmt.run(ime, ident_sifra);
+
+  if (insertResult.changes && insertResult.changes === 1) {
+    res.render("users/applay", { result: { success: true } });
+  } else {
+    res.render("users/applay", { result: { database_error: true } });
+  }
+
+  console.log("Rezultat upita:", insertResult);
+
+
+});
+
 
 module.exports = router;

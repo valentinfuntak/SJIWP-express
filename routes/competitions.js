@@ -64,7 +64,7 @@ router.get("/add", adminRequired, function (req, res, next) {
     res.render("competitions/form", { result: { display_form: true } });
 });
 
-// SCHEMA signup
+// SCHEMA add
 const schema_add = Joi.object({
     name: Joi.string().min(3).max(50).required(),
     description: Joi.string().min(3).max(1000).required(),
@@ -115,11 +115,10 @@ router.post("/edit", adminRequired, function (req, res, next) {
 
 // GET /competitions/applay
 router.get("/applay/:id", function (req, res, next) {
-    res.render("competitions/applay", { result: { display_form: true } });
+    res.render("Users/applay", { result: { display_form: true } });
 });
 
-
-// POST /competitions/applay/
+// POST /competitions/applay
 router.post("/edit", function (req, res, next) {
 
 });
