@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Joi = require("joi");
 const { db } = require("../services/db.js");
-const { getUserJwt, checkEmailUnique, authRequired, checkIdent_sifiraUnique, checkimeUnique} = require("../services/auth.js");
+const { getUserJwt, checkEmailUnique, authRequired,checkimeUnique} = require("../services/auth.js");
 const bcrypt = require("bcrypt");
 
 // GET /users/data
@@ -156,7 +156,6 @@ router.post("/signup", function (req, res, next) {
     return;
   }
 
-  const passwordHash = bcrypt.hashSync(req.body.password, 10);
   const stmt2 = db.prepare("INSERT INTO users (email, password, name, signed_at, role) VALUES (?, ?, ?, ?, ?);");
   const insertResult = stmt2.run(req.body.email, passwordHash, req.body.name, new Date().toISOString(), "user");
 
@@ -167,32 +166,5 @@ router.post("/signup", function (req, res, next) {
   }
   return;
 });
-
-// SCHEMA applay
-const schema_applay = Joi.object({
-  ime: Joi.string().min(3).max(25).required(),
-  ident_sifra: Joi.string().min(6).max(6).required()
-});
-
-//POST /users/applay
-router.post("/applay", function (req, res, next) {
-  const result = schema_applay.validate(req.body);
-  if (result.error) {
-    res.render("competitions/forma_natjecanja", { result: { validation_error: true, display_form: false } });
-    return;
-  }
-
-  if (!checkIdent_sifiraUnique &&(req.body.ident_sifra)) {
-    res.render("competitions/forma_natjecanja", { result: { Identsifra_in_user: true, display_form: true } });
-    return;
-  }
-
-  const ime = req.body.ime;
-  const ident_sifra = req.body.ident_sifra;
-
-  const stmt = db.prepare("INSERT INTO  Prijava (ime, ident_sifra) VALUES (?,?);");
-  const insertResult = stmt.run(ime, ident_sifra);
-});
-
 
 module.exports = router;

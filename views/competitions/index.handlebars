@@ -20,7 +20,7 @@
             <tbody>
                 {{#each result.items}}
                 <tr>
-                    <th>{{this.id}}</th>
+                    <th>{{this.id_competition}}</th>
                     <td>{{this.name}}</td>
                     <td>
                         <div class="line-clamp-2">
@@ -31,10 +31,12 @@
                         <span x-text="new Date('{{this.apply_till}}').toLocaleString()"></span>
                     </td>
                     <td>{{this.author}}</td>
-                    <td class="flex flex-wrap gap-2">               
-                        <a href="/competitions/edit/{{this.id}}" class="btn bg-green-600 btn-xs">Uredi</a>
-                        <a href="/competitions/delete/{{this.id}}" class="btn bg-red-600 btn-xs">Briši</a>
-                        <a href="/competitions/applay/{{this.id}}" class="btn  bg-yellow-500 btn-xs">Prijava</a>
+                    <td class="flex flex-wrap gap-2">
+                        {{#if ../user.is_admin}}
+                        <a href="/competitions/edit/{{this.id_competition}}" class="btn bg-green-600 btn-xs">Uredi</a>
+                        <a href="/competitions/delete/{{this.id_competition}}" class="btn bg-red-600 btn-xs">Briši</a>
+                        {{/if}}
+                        <a href="/competitions/apply/{{this.id_competition}}" class="btn  bg-yellow-500 btn-xs">Prijava</a>
                     </td>
                 </tr>
                 {{/each}}

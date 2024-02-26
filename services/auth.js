@@ -59,16 +59,7 @@ function checkEmailUnique(email) {
         return true;
     }
 }
-function checkIdent_sifiraUnique(ident_sifra){
-    const stmt = db.prepare("SELECT count(*) FROM Prijava WHERE ident_sifra = ?;");
-    const result = stmt.get(ident_sifra);
 
-    if (result["count(*)"] >= 1) {
-        return false;
-    } else {
-        return true;
-    }
-}
 function checkimeUnique(ime){
     const stmt = db.prepare("SELECT count(*) FROM Prijava WHERE ime = ?;");
     const result = stmt.get(ime);
@@ -86,7 +77,6 @@ module.exports = {
     parseAuthCookie,
     authRequired,
     checkEmailUnique,
-    checkIdent_sifiraUnique,
     checkimeUnique,
     adminRequired
 };
