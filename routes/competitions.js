@@ -20,7 +20,7 @@ router.get("/", authRequired, function (req, res, next) {
 
 // SCHEMA id
 const schema_id = Joi.object({
-    id_competition: Joi.number().integer().positive().required()
+    id: Joi.number().integer().positive().required()
 });
 
 // GET /competitions/delete/:id_competition
@@ -41,7 +41,7 @@ router.get("/delete/:id_competition", adminRequired, function (req, res, next) {
 });
 
 // GET /competitions/edit/:id
-router.get("/edit/:id_competition", adminRequired, function (req, res, next) {
+router.get("/edit/:id", adminRequired, function (req, res, next) {
     // do validation
     const result = schema_id.validate(req.params);
     if (result.error) {
@@ -118,18 +118,18 @@ const schema_apply = Joi.object({
 });
 
 // GET /competitions/apply/:id
-router.get("/apply/:id_competition", function (req, res, next) {
-    const result = schema_apply.validate({ id: req.user.id, id_competition: req.params.id_competition });
+router.get("/apply/:id", function (req, res, next) {
+    const result = schema_apply.validate({ id: req.users.id, id_competition: req.params.id_competition });
     if (result.error) {
         throw new Error("Desila se pogreška prilikom prijave!");
     }
     const stmt = db.prepare("INSERT INTO apply (id, id_competition) VALUES (?, ?);");
-    const insertResult = stmt.run(req.user.id, req.params.id_competition);
+    const insertResult = stmt.run(req.users.id, req.params.id_competition);
 
     if (insertResult.changes && applyResult.changes === 1) {
         res.render("competitions/form", { result: { signedUp: true } });
     } else {
-        res.render("competitions/form", { result: { sdatabase_error: true } })
+        res.render("competitions/form", { result: { sdatabase_error: true } });
     }
 });
 
