@@ -117,6 +117,7 @@ router.get("/apply/:id", function (req, res, next) {
         throw new Error("Neispravan poziv");
     }
     const stmt2 = db.prepare("SELECT * FROM apply WHERE user_id = ? AND competition_id = ?");
+<<<<<<< HEAD
     const dbResult = stmt2.get(req.user.sub, req.params.id);
 
     if (dbResult) {
@@ -133,6 +134,22 @@ router.get("/apply/:id", function (req, res, next) {
         }
     }
 
+=======
+    const dbResult = stmt2.get(req.users.sub, req.params.id);
+
+    if(dbResult){
+        res.render("competitions/form", {result : {alreadySignedUp: true} });
+    }else{
+        const stmt = db.prepare("INSERT INTO apply (user_id, competition_id) VALUES (?,?);");
+        const singUpResult = stmt.run(req.user.sub, req.params.id_competition);
+    }
+
+    if (signUpResult.changes && signUpResult.changes === 1) {
+        res.render("competitions/form", { result: { signedUp: true } });
+    } else {
+        res.render("competitions/form", { result: { database_error: true } });
+    }
+>>>>>>> 0d8a731d84d25c2cc74ae37425f7bfe7b537d990
 });
 
 
