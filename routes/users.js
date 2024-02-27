@@ -2,14 +2,14 @@ const express = require("express");
 const router = express.Router();
 const Joi = require("joi");
 const { db } = require("../services/db.js");
-const { getUserJwt, checkEmailUnique, authRequired } = require("../services/auth.js");
+const { getUserJwt, checkEmailUnique, authRequired,checkimeUnique} = require("../services/auth.js");
 const bcrypt = require("bcrypt");
 
 // GET /users/data
 router.get("/data", authRequired, function (req, res, next) {
   res.render("users/data", { result: { display_form: true } });
 });
-
+//Schema data
 const schema_data = Joi.object({
   name: Joi.string().min(3).max(50).required(),
   email: Joi.string().email().max(50).required(),
@@ -152,11 +152,10 @@ router.post("/signup", function (req, res, next) {
   }
 
   if (!checkEmailUnique(req.body.email)) {
-    res.render("users/signup", { result: { email_in_use: true, display_form: true } });
+    res.render("users/signup", { result: {email_in_use: true, display_form: true } });
     return;
   }
 
-  const passwordHash = bcrypt.hashSync(req.body.password, 10);
   const stmt2 = db.prepare("INSERT INTO users (email, password, name, signed_at, role) VALUES (?, ?, ?, ?, ?);");
   const insertResult = stmt2.run(req.body.email, passwordHash, req.body.name, new Date().toISOString(), "user");
 
