@@ -147,14 +147,14 @@ router.get("/rezultati/:id", function (req, res, next) {
 
 
     const stmt = db.prepare(`
-        SELECT a.id, a.bodovi AS  points, u.name AS nameUser, c.name AS nameCompetition 
+        SELECT a.competition_id, a.id, a.bodovi AS points, u.name AS nameUser, c.name AS nameCompetition, c.apply_till AS date
         FROM users u, apply a, competitions c 
         WHERE a.user_id = u.id AND a.competition_id = c.id AND a.id = ? 
         ORDER BY bodovi`);
-    const dbResult = stmt.all(req.params.id);
+    const podaci = stmt.all(req.params.id);
 
-    if (dbResult) {
-        res.render("competitions/rezultati", { result: { items: dbResult } });
+    if (podaci) {
+        res.render("competitions/rezultati", { result: { items: podaci } });
     } else {
         res.render("competitions/rezultati", { result: { database_error: true } });
     }

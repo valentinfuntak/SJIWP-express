@@ -1,41 +1,39 @@
 {{#if result.database_error}}
 {{> database_error}}
 {{/if}}
-<div class="p-2">
-    <div class="overflow-x-auto">
-        <table class="table">
-            <!-- head -->
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Ime natjecatelja</th>
-                    <th>Ime natjecanja</th>
-                    <th>Rok prijave</th>
-                    <th>Bodovi</th>
-                </tr>
-            </thead>
-            <!-- body -->
-            <tbody>
-                {{#each result.items}}
-                <tr>
-                    <th>{{this.id}}</th>
-                    <td>{{this.nameUser}}</td>
-                    <td>{{this.nameCompetition }}</td>
-                    <td>{{this.date }}</td>
-                    <td>
-                        <form method="post" action="/competitions/rezultati/{{this.id}}" class="flex flex-col gap-2">
-                            <div class="pb-2 flex flex-col">
-                                <input type="text" name="bodovi" required="" minlength="1" maxlength="50"value="{{this.bodovi}}"
-                                 class="input input-bordered flex flex-col gap-2" placeholder="Unesite broj bodova" />
-                                <input type="text" name="competition_id" required="" hidden="" minlength="1"
-                                    maxlength="50" value="{{this.competition_id}}" />
-                            </div>
-                            <input type="submit" value="Potvrdi" class="flex-1 btn btn-primary" />
-                        </form>
-                    </td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-    </div>
-</div>
+<div class="overflow-x-auto">
+    <table class="table">
+        <!-- head -->
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ime natjecatelja</th>
+                <th>ID natjecanja</th>
+                <th>Rok prijave</th>
+                <th>Bodovi</th>
+            </tr>
+        </thead>
+        <!-- body -->
+        <tbody>
+            {{#each result.items}}
+            <tr>
+                <th>{{this.id}}</th>
+                <td>{{this.nameUser}}</td>
+                <td>{{this.competition_id }}</td>
+                <td>{{this.date}}</td>
+                <td>
+                    <form method="post" action="/competitions/rezultat/{{this.id}}" class="flex flex-col gap-2">
+                        <div class="pb-2 flex flex-col">
+                            <input type="text" name="bodovi" required="" minlength="1" maxlength="50"
+                                value="{{this.points}}" class="input input-bordered flex flex-col gap-2"
+                                placeholder="Unesite broj bodova" />     
+                            <input type="text" name="competition_id" required="" hidden="" minlength="1" maxlength="50"
+                                value="{{this.competition_id }}" />                        
+                        </div>
+                        <input type="submit" value="Potvrdi" class="flex-1 btn btn-primary" />
+                    </form>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
