@@ -1,3 +1,6 @@
+{{#if result.database_error}}
+{{> database_error}}
+{{/if}}
 <div class="p-2">
     <div class="overflow-x-auto">
         <table class="table">
@@ -7,8 +10,8 @@
                     <th>ID</th>
                     <th>Ime natjecatelja</th>
                     <th>Ime natjecanja</th>
-                    <th>Broj bodova</th>
-                    <th>Mogućnosti</th>
+                    <th>Rok prijave</th>
+                    <th>Bodovi</th>
                 </tr>
             </thead>
             <!-- body -->
@@ -18,13 +21,16 @@
                     <th>{{this.id}}</th>
                     <td>{{this.nameUser}}</td>
                     <td>{{this.nameCompetition }}</td>
-                    <td>{{this.points}}</td>
-                    <td class="">
-                        <form method="post" action="/competitions/rezultati/{{this.id}}">
-                            <input type="text" name="score" placeholder="Unesite broj bodova" value="{{this.score}}"
-                                class="input input-bordered w-full max-w-xs" />
-                            <input type="hidden" name="id" value="{{this.id}}" />
-                            <input type="submit" class="btn btn-primary" value="Potvrdi" />
+                    <td>{{this.date }}</td>
+                    <td>
+                        <form method="post" action="/competitions/rezultati/{{this.id}}" class="flex flex-col gap-2">
+                            <div class="pb-2 flex flex-col">
+                                <input type="text" name="bodovi" required="" minlength="1" maxlength="50"value="{{this.bodovi}}"
+                                 class="input input-bordered flex flex-col gap-2" placeholder="Unesite broj bodova" />
+                                <input type="text" name="competition_id" required="" hidden="" minlength="1"
+                                    maxlength="50" value="{{this.competition_id}}" />
+                            </div>
+                            <input type="submit" value="Potvrdi" class="flex-1 btn btn-primary" />
                         </form>
                     </td>
                 </tr>

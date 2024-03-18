@@ -11,7 +11,7 @@ router.get("/", authRequired, function (req, res, next) {
         SELECT c.id, c.name, c.description, u.name AS author, c.apply_till
         FROM competitions c, users u
         WHERE c.author_id = u.id
-        ORDER BY c.apply_till
+        ORDER BY c.apply_till 
     `);
     const result = stmt.all();
 
@@ -140,42 +140,43 @@ router.get("/apply/:id", function (req, res, next) {
 // GET /competitions/rezultati/:id
 router.get("/rezultati/:id", function (req, res, next) {
     // do validation
-
     const result = schema_id.validate(req.params);
     if (result.error) {
         throw new Error("Neispravan poziv");
     }
+
 
     const stmt = db.prepare(`
         SELECT a.id, a.bodovi AS  points, u.name AS nameUser, c.name AS nameCompetition 
         FROM users u, apply a, competitions c 
         WHERE a.user_id = u.id AND a.competition_id = c.id AND a.id = ? 
-        ORDER BY bodovi`);        
+        ORDER BY bodovi`);
     const dbResult = stmt.all(req.params.id);
 
-    console.log(dbResult);
+    if (dbResult) {
+        res.render("competitions/rezultati", { result: { items: dbResult } });
+    } else {
+        res.render("competitions/rezultati", { result: { database_error: true } });
+    }
 
-    res.render("competitions/rezultati", { result: { items: dbResult } });
 });
 
-//POST /competitions/rezultati/:id
-router.post("/rezultati/:id", function (req, res, next) {
+// POST /competitions/rezultat/:id
+router.post("/rezultat/:id", adminRequired, function (req, res, next) {
+    // do validation
     const result = schema_id.validate(req.params);
     if (result.error) {
         throw new Error("Neispravan poziv");
     }
 
-    const { id } = req.params;
-    const { bodovi } = req.body;
+    const stmt = db.prepare("UPDATE apply SET bodovi = ? WHERE id = ?;");
+    const selectResult = stmt.run(req.body.bodovi, req.params.id);
 
-    const stmt = db.prepare("UPDATE apply SET bodovi = ? WHERE id = ?");
-    const updateResult = stmt.run(bodovi, id);
-
-    if (updateResult.changes && updateResult.changes === 1) {
-        res.render("competitions/form", { result: { bodoviUpdated: true } });
-    } else {
-        res.render("competitions/form", { result: { databaseError: true } });
+    if (!selectResult) {
+        throw new Error("Neispravan poziv");
     }
+
+    res.redirect("/competitions/rezultati/" + req.body.competition_id);
 });
 
 
