@@ -8,7 +8,7 @@
             <tr>
                 <th>ID</th>
                 <th>Ime natjecatelja</th>
-                <th>ID natjecanja</th>
+                <th>Ime natjecanja</th>
                 <th>Rok prijave</th>
                 <th>Bodovi</th>
             </tr>
@@ -19,7 +19,7 @@
             <tr>
                 <th>{{this.id}}</th>
                 <td>{{this.nameUser}}</td>
-                <td>{{this.competition_id }}</td>
+                <td>{{this.nameCompetition }}</td>
                 <td>{{this.date}}</td>
                 <td>
                     <form method="post" action="/competitions/rezultat/{{this.id}}" class="flex flex-col gap-2">

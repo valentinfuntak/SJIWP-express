@@ -8,10 +8,10 @@ const { decode } = require("jsonwebtoken");
 // GET /competitions
 router.get("/", authRequired, function (req, res, next) {
     const stmt = db.prepare(`
-        SELECT c.id, c.name, c.description, u.name AS author, c.apply_till
+        SELECT c.id, c.name , c.description, u.name AS author, c.apply_till
         FROM competitions c, users u
         WHERE c.author_id = u.id
-        ORDER BY c.apply_till 
+        ORDER BY c.id 
     `);
     const result = stmt.all();
 
@@ -31,7 +31,7 @@ router.get("/delete/:id", adminRequired, function (req, res, next) {
         throw new Error("Neispravan poziv");
     }
 
-    const stmt = db.prepare("DELETE FROM competitions WHERE id = ?;");
+    const stmt = db.prepare("DELETE FROM competitions WHERE id = ?, DELETE FROM apply WHERE competition_id = ?");
     const deleteResult = stmt.run(req.params.id);
 
     if (!deleteResult.changes || deleteResult.changes !== 1) {
@@ -177,6 +177,26 @@ router.post("/rezultat/:id", adminRequired, function (req, res, next) {
     }
 
     res.redirect("/competitions/rezultati/" + req.body.competition_id);
+});
+
+// GET /competitions/izvjesce/:id
+router.get("/izvjesce/:id", function (req, res, next) {
+    // do validation
+    const result = schema_id.validate(req.params);
+    if (result.error) {
+        throw new Error("Neispravan poziv");
+    }
+
+
+    const stmt = db.prepare(`
+        SELECT a.competition_id, a.id, a.bodovi AS points, u.name AS nameUser, c.name AS nameCompetition, c.apply_till AS date
+        FROM users u, apply a, competitions c 
+        WHERE a.user_id = u.id AND a.competition_id = c.id AND a.id = ? 
+        ORDER BY bodovi`);
+    const podaci = stmt.all(req.params.id);
+
+    res.render("competitions/izvješće", { result: { items: podaci , noMenu: true} });
+
 });
 
 
