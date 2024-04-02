@@ -8,7 +8,7 @@
             <!-- head -->
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>ID natjecanja</th>
                     <th>Ime</th>
                     <th>Opis</th>
                     <th>Rok prijave</th>
@@ -29,17 +29,17 @@
                     </td>
                     <td x-data="{}">
                         <span x-text="new Date('{{this.apply_till}}').toLocaleString()"></span>
-                    </td>
+                    </td> 
                     <td>{{this.author}}</td>
                     <td class="flex flex-wrap gap-2">
                         <a href="/competitions/apply/{{this.id}}" class="btn  bg-yellow-500 btn-xs">Prijava</a>
+                        <a href="/competitions/ispis/{{this.id}}" class="btn bg-orange-300 btn-xs">Ispis</a>
                         {{#if ../user.is_admin}}
                         <a href="/competitions/edit/{{this.id}}" class="btn bg-green-600 btn-xs">Uredi</a>
                         <a href="/competitions/delete/{{this.id}}" class="btn bg-red-600 btn-xs">Briši</a>
-                        <a href="/competitions/rezultati/{{this.id}}" class="btn bg-fuchsia-600 btn-xs">Rezultati</a>                        
-                        {{/if}}
-                        <a href="/competitions/izvjesce/{{this.id}}" class="btn bg-orange-300 btn-xs">Izvješće</a>
-                    </td>
+                        <a href="/competitions/rezultati/{{this.id}}" class="btn bg-fuchsia-600 btn-xs">Unos bodova</a>                                      
+                        {{/if}}                       
+                    </td>                   
                 </tr>
                 {{/each}}
             </tbody>

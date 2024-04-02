@@ -31,8 +31,11 @@ router.get("/delete/:id", adminRequired, function (req, res, next) {
         throw new Error("Neispravan poziv");
     }
 
-    const stmt = db.prepare("DELETE FROM competitions WHERE id = ?, DELETE FROM apply WHERE competition_id = ?");
-    const deleteResult = stmt.run(req.params.id);
+    const stmt = db.prepare("DELETE FROM apply WHERE competition_id = ?");
+    const deleteApply = stmt.run(req.params.id);
+
+    const stmt2 = db.prepare("DELETE FROM competitions WHERE id = ?;");
+    const deleteResult = stmt2.run(req.params.id);
 
     if (!deleteResult.changes || deleteResult.changes !== 1) {
         throw new Error("Operacija nije uspjela");
@@ -145,11 +148,10 @@ router.get("/rezultati/:id", function (req, res, next) {
         throw new Error("Neispravan poziv");
     }
 
-
     const stmt = db.prepare(`
         SELECT a.competition_id, a.id, a.bodovi AS points, u.name AS nameUser, c.name AS nameCompetition, c.apply_till AS date
         FROM users u, apply a, competitions c 
-        WHERE a.user_id = u.id AND a.competition_id = c.id AND a.id = ? 
+        WHERE a.user_id = u.id AND a.competition_id = c.id AND c.id = ? 
         ORDER BY bodovi`);
     const podaci = stmt.all(req.params.id);
 
@@ -177,25 +179,23 @@ router.post("/rezultat/:id", adminRequired, function (req, res, next) {
     }
 
     res.redirect("/competitions/rezultati/" + req.body.competition_id);
-});
+}); 
 
-// GET /competitions/izvjesce/:id
-router.get("/izvjesce/:id", function (req, res, next) {
-    // do validation
+// GET /competitions/ispis/:id
+router.get("/ispis/:id", function (req, res, next) {
     const result = schema_id.validate(req.params);
     if (result.error) {
         throw new Error("Neispravan poziv");
     }
 
-
     const stmt = db.prepare(`
         SELECT a.competition_id, a.id, a.bodovi AS points, u.name AS nameUser, c.name AS nameCompetition, c.apply_till AS date
         FROM users u, apply a, competitions c 
-        WHERE a.user_id = u.id AND a.competition_id = c.id AND a.id = ? 
-        ORDER BY bodovi`);
+        WHERE a.user_id = u.id AND a.competition_id = c.id AND c.id = ? 
+        ORDER BY bodovi DESC `);
     const podaci = stmt.all(req.params.id);
 
-    res.render("competitions/izvješće", { result: { items: podaci , noMenu: true} });
+    res.render("competitions/ispis", { result: { items: podaci , printLayout: true} });
 
 });
 

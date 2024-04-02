@@ -1,0 +1,36 @@
+<div>
+    <div style="display: flex; justify-content: center; font-size: 20px;">Rezultati natjecanja iz: </div>
+    <div style="display: flex; justify-content: center; font-size: 50px;">
+        {{this.result.items.[0].nameCompetition}}
+    </div>
+    <div style="display: flex; justify-content: center;">
+        Prijave su trajale do: &nbsp;<div x-data="{}"><span
+                x-text="new Date('{{this.result.items.[0].date}}').toLocaleString()"></span></div>
+    </div>
+</div>
+<div class="overflow-x-auto" style="display: flex; justify-content: center">
+    <table class="table" style="width:700px;">
+        <!-- head -->
+        <thead>
+            <tr>
+                <th>Plasman</th>
+                <th>Ime natjecanja</th>
+                <th>Ime natjecatelja</th>
+                <th>Broj bodova</th>
+            </tr>
+        </thead>
+        <!-- body -->
+        <tbody>
+            {{#each result.items}}
+            <tr>
+                <td x-data="{}">
+                    <span x-text="{{@index}}+1"></span>.
+                </td>
+                <td>{{this.nameCompetition}}</td>
+                <td>{{this.nameUser}}</td>
+                <td>{{this.points}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
