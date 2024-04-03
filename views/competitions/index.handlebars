@@ -12,6 +12,8 @@
                     <th>Ime</th>
                     <th>Opis</th>
                     <th>Rok prijave</th>
+                    <th>Maksimalni broj natjecatelja</th>
+                    <th>Trenutni broj natjecatelja</th>
                     <th>Autor</th>
                     <th>Mogućnosti</th>
                 </tr>
@@ -30,6 +32,8 @@
                     <td x-data="{}">
                         <span x-text="new Date('{{this.apply_till}}').toLocaleString()"></span>
                     </td> 
+                    <td>{{this.max_comp}}</td>
+                    <td>{{this.cur_comp}}</td>
                     <td>{{this.author}}</td>
                     <td class="flex flex-wrap gap-2">
                         <a href="/competitions/apply/{{this.id}}" class="btn  bg-yellow-500 btn-xs">Prijava</a>

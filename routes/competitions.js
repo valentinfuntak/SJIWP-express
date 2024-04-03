@@ -8,7 +8,7 @@ const { decode } = require("jsonwebtoken");
 // GET /competitions
 router.get("/", authRequired, function (req, res, next) {
     const stmt = db.prepare(`
-        SELECT c.id, c.name , c.description, u.name AS author, c.apply_till
+        SELECT c.id, c.name , c.description, c.max_comp, c.cur_comp, u.name AS author, c.apply_till
         FROM competitions c, users u
         WHERE c.author_id = u.id
         ORDER BY c.id 
@@ -70,7 +70,9 @@ router.get("/add", adminRequired, function (req, res, next) {
 const schema_add = Joi.object({
     name: Joi.string().min(3).max(50).required(),
     description: Joi.string().min(3).max(1000).required(),
-    apply_till: Joi.date().iso().required()
+    apply_till: Joi.date().iso().required(),
+    max_comp: Joi.number().integer().min(1).required(),
+    cur_comp: Joi.number().integer().min(0).required()
 });
 // POST /competitions/add
 router.post("/add", adminRequired, function (req, res, next) {
@@ -81,22 +83,28 @@ router.post("/add", adminRequired, function (req, res, next) {
         return;
     }
 
-    const stmt = db.prepare("INSERT INTO competitions (name, description, author_id, apply_till) VALUES (?, ?, ?, ?);");
-    const insertResult = stmt.run(req.body.name, req.body.description, req.user.sub, req.body.apply_till);
+    console.log("Greska!");
+
+    const stmt = db.prepare("INSERT INTO competitions (name, description, author_id, apply_till, max_comp, cur_comp) VALUES (?, ?, ?, ?, ?, ?);");
+    const insertResult = stmt.run(req.body.name, req.body.description, req.user.sub, req.body.apply_till, req.body.max_comp, req.body.cur_comp);
+
+    //nakon descr islo req.user.sub,
 
     if (insertResult.changes && insertResult.changes === 1) {
         res.render("competitions/form", { result: { success: true } });
     } else {
         res.render("competitions/form", { result: { database_error: true } });
     }
-});
+}); 
 
 // SCHEMA edit
 const schema_edit = Joi.object({
     id: Joi.number().integer().positive().required(),
     name: Joi.string().min(3).max(50).required(),
     description: Joi.string().min(3).max(1000).required(),
-    apply_till: Joi.date().iso().required()
+    apply_till: Joi.date().iso().required(),
+    max_comp: Joi.number().integer().min(1).max(50).required,
+    cur_comp: Joi.number().integer().min(0).max(50).required
 });
 // POST /competitions/edit/
 router.post("/edit", adminRequired, function (req, res, next) {
@@ -106,8 +114,8 @@ router.post("/edit", adminRequired, function (req, res, next) {
         res.render("competitions/form", { result: { validation_error: true, display_form: true } });
         return;
     }
-    const stmt = db.prepare("UPDATE competitions SET name = ?, description = ?, apply_till = ? WHERE id = ?;");
-    const updateResult = stmt.run(req.body.name, req.body.description, req.body.apply_till, req.body.id);
+    const stmt = db.prepare("UPDATE competitions SET name = ?, description = ?, apply_till = ?, max_comp = ?, cur_comp = ?, WHERE id = ?;");
+    const updateResult = stmt.run(req.body.name, req.body.description, req.body.apply_till, req.body.max_comp, req.body.cur_comp, req.body.id);
     if (updateResult.changes && updateResult.changes === 1) {
         res.redirect("/competitions");
     } else {
@@ -149,7 +157,8 @@ router.get("/rezultati/:id", function (req, res, next) {
     }
 
     const stmt = db.prepare(`
-        SELECT a.competition_id, a.id, a.bodovi AS points, u.name AS nameUser, c.name AS nameCompetition, c.apply_till AS date
+        SELECT a.competition_id, a.id, a.bodovi AS points, u.name AS nameUser, c.name AS nameCompetition, c.apply_till AS date,
+        c.max_comp AS korisniciMax, c.cur_comp AS korisniciTren
         FROM users u, apply a, competitions c 
         WHERE a.user_id = u.id AND a.competition_id = c.id AND c.id = ? 
         ORDER BY bodovi`);
