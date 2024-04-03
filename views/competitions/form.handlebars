@@ -14,7 +14,7 @@
         </div>
         <div class="pb-2 flex flex-col">
             <label>Maksimalan broj natjecatelja</label>
-            <input type="number" name="max_comp" class="bg-neutral" required=""{{#if
+            <input type="number" name="max_comp" class="bg-neutral" required="" {{#if
                 result.edit}}value="{{result.edit.max_comp}}" {{/if}} />
         </div>
         <div class="pb-2 flex flex-col">
@@ -33,6 +33,7 @@
         {{> form_buttons }}
     </form>
     {{/if}}
+
 
     {{#if result.validation_error}}
     {{> validation_error }}
@@ -87,4 +88,4 @@
         </div>
     </div>
     {{/if}}
-</div> 
+</div>

@@ -61,6 +61,34 @@ router.get("/edit/:id", adminRequired, function (req, res, next) {
     res.render("competitions/form", { result: { display_form: true, edit: selectResult } });
 });
 
+// SCHEMA edit
+const schema_edit = Joi.object({
+    id: Joi.number().integer().positive().required(),
+    name: Joi.string().min(3).max(50).required(),
+    description: Joi.string().min(3).max(1000).required(),
+    apply_till: Joi.date().iso().required(),
+    max_comp: Joi.number().integer().min(1).required(),
+    cur_comp: Joi.number().integer().min(0).required()
+});
+
+// POST /competitions/edit/
+router.post("/edit", adminRequired, function (req, res, next) {
+    // do validation
+    const result = schema_edit.validate(req.body);
+    if (!result.error) {
+        res.render("competitions/form", { result: { validation_error: true, display_form: true } });
+        return;
+    } 
+    const stmt = db.prepare("UPDATE competitions SET name = ?, description = ?, max_comp = ?, cur_comp = ?, apply_till = ? WHERE id = ?");
+    const updateResult = stmt.run(req.body.name, req.body.description, req.body.max_comp, req.body.cur_comp, req.body.apply_till, req.body.competition_id);
+    
+    /*if (updateResult.changes && updateResult.changes === 1) {
+        res.redirect("/competitions/index");
+    } else {
+        res.render("competitions/form", { result: { database_error: true } });
+    }*/
+});
+
 // GET /competitions/add
 router.get("/add", adminRequired, function (req, res, next) {
     res.render("competitions/form", { result: { display_form: true } });
@@ -83,12 +111,8 @@ router.post("/add", adminRequired, function (req, res, next) {
         return;
     }
 
-    console.log("Greska!");
-
     const stmt = db.prepare("INSERT INTO competitions (name, description, author_id, apply_till, max_comp, cur_comp) VALUES (?, ?, ?, ?, ?, ?);");
     const insertResult = stmt.run(req.body.name, req.body.description, req.user.sub, req.body.apply_till, req.body.max_comp, req.body.cur_comp);
-
-    //nakon descr islo req.user.sub,
 
     if (insertResult.changes && insertResult.changes === 1) {
         res.render("competitions/form", { result: { success: true } });
@@ -96,32 +120,6 @@ router.post("/add", adminRequired, function (req, res, next) {
         res.render("competitions/form", { result: { database_error: true } });
     }
 }); 
-
-// SCHEMA edit
-const schema_edit = Joi.object({
-    id: Joi.number().integer().positive().required(),
-    name: Joi.string().min(3).max(50).required(),
-    description: Joi.string().min(3).max(1000).required(),
-    apply_till: Joi.date().iso().required(),
-    max_comp: Joi.number().integer().min(1).max(50).required,
-    cur_comp: Joi.number().integer().min(0).max(50).required
-});
-// POST /competitions/edit/
-router.post("/edit", adminRequired, function (req, res, next) {
-    // do validation
-    const result = schema_edit.validate(req.body);
-    if (result.error) {
-        res.render("competitions/form", { result: { validation_error: true, display_form: true } });
-        return;
-    }
-    const stmt = db.prepare("UPDATE competitions SET name = ?, description = ?, apply_till = ?, max_comp = ?, cur_comp = ?, WHERE id = ?;");
-    const updateResult = stmt.run(req.body.name, req.body.description, req.body.apply_till, req.body.max_comp, req.body.cur_comp, req.body.id);
-    if (updateResult.changes && updateResult.changes === 1) {
-        res.redirect("/competitions");
-    } else {
-        res.render("competitions/form", { result: { database_error: true } });
-    }
-});
 
 // GET /competitions/apply/:id
 router.get("/apply/:id", function (req, res, next) {
@@ -189,6 +187,17 @@ router.post("/rezultat/:id", adminRequired, function (req, res, next) {
 
     res.redirect("/competitions/rezultati/" + req.body.competition_id);
 }); 
+
+// GET /competitions/deleteComp/:id
+router.get("/deleteComp/:id", adminRequired, function (req, res, next) {
+    // do validation
+    const result = schema_id.validate(req.params);   
+
+    const stmt = db.prepare("DELETE FROM apply WHERE user_id = ?");
+    const deleteComp= stmt.run(req.params.id);
+    
+    res.render("competitions/rezultati");
+});
 
 // GET /competitions/ispis/:id
 router.get("/ispis/:id", function (req, res, next) {

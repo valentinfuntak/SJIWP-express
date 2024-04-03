@@ -8,6 +8,7 @@
                 <th>Ime natjecanja</th>
                 <th>Rok prijave</th>
                 <th>Bodovi</th>
+                <th>Mogucnosti</th>
             </tr>
         </thead>
         <!-- body -->
@@ -28,9 +29,10 @@
                         <input type="text" name="competition_id" required="" hidden="" minlength="1" maxlength="50"
                             value="{{this.competition_id }}" />
 
-                        <input type="submit" value="Potvrdi" class="flex-1 btn btn-primary" />
-
+                        <input type="submit" value="Potvrdi" class="flex-1 btn btn-primary" />    
+                        <a href="/competitions/deleteComp/{{this.competition_id}}" class="flex-1 btn bg-red-600">Ukloni natjecatelja</a>                    
                     </form>
+                    
                 </td>
             </tr>
             {{/each}}
