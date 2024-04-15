@@ -81,12 +81,6 @@ router.post("/edit", adminRequired, function (req, res, next) {
     } 
     const stmt = db.prepare("UPDATE competitions SET name = ?, description = ?, max_comp = ?, cur_comp = ?, apply_till = ? WHERE id = ?");
     const updateResult = stmt.run(req.body.name, req.body.description, req.body.max_comp, req.body.cur_comp, req.body.apply_till, req.body.competition_id);
-    
-    /*if (updateResult.changes && updateResult.changes === 1) {
-        res.redirect("/competitions/index");
-    } else {
-        res.render("competitions/form", { result: { database_error: true } });
-    }*/
 });
 
 // GET /competitions/add
@@ -123,7 +117,7 @@ router.post("/add", adminRequired, function (req, res, next) {
 
 // GET /competitions/apply/:id
 router.get("/apply/:id", function (req, res, next) {
-    const result = schema_id.validate(req.params);
+    /* const result = schema_id.validate(req.params);
     if (result.error) {
         throw new Error("Neispravan poziv");
     }
@@ -142,8 +136,30 @@ router.get("/apply/:id", function (req, res, next) {
         } else {
             res.render("competitions/form", { result: { database_error: true } });
         }
+    } */
+    
+    const result = schema_id.validate(req.params);
+    if (result.error) {
+        throw new Error("Neispravan poziv");
     }
 
+    const stmt2 = db.prepare("SELECT * FROM apply WHERE user_id = ? AND competition_id = ?");
+    const dbResult = stmt2.get(req.user.sub, req.params.id);
+
+    if (dbResult) {
+        res.render("competitions/form", { result: { alreadySignedUp: true } });
+    } else {
+        const stmt = db.prepare("INSERT INTO apply (user_id, competition_id) VALUES (?,?)");
+        const signUpResult = stmt.run(req.user.sub, req.params.id);
+
+        if (signUpResult.changes && signUpResult.changes === 1) {
+            // Ako je prijava uspješno dodana, šaljemo ažurirani broj korisnika kao odgovor
+            const newNumberOfUsers = parseInt(req.params.cur_comp) + 1;
+            res.render("competitions/form", { result: { signedUp: true, cur_comp: newNumberOfUsers } });
+        } else {
+            res.render("competitions/form", { result: { databaseError: true } });
+        }
+    }
 });
 
 // GET /competitions/rezultati/:id
@@ -191,13 +207,46 @@ router.post("/rezultat/:id", adminRequired, function (req, res, next) {
 // GET /competitions/deleteComp/:id
 router.get("/deleteComp/:id", adminRequired, function (req, res, next) {
     // do validation
-    const result = schema_id.validate(req.params);   
 
-    const stmt = db.prepare("DELETE FROM apply WHERE user_id = ?");
-    const deleteComp= stmt.run(req.params.id);
-    
-    res.render("competitions/rezultati");
+    const stmt = db.prepare(`
+        SELECT a.competition_id, a.id, a.bodovi AS points, u.name AS nameUser, c.name AS nameCompetition, c.apply_till AS date,
+        c.max_comp AS korisniciMax, c.cur_comp AS korisniciTren
+        FROM users u, apply a, competitions c 
+        WHERE a.user_id = u.id AND a.competition_id = c.id AND c.id = ? 
+        ORDER BY bodovi`);
+    const podaci = stmt.all(req.params.id);
+
+    if (podaci) {
+        res.render("competitions/rezultati", { result: { items: podaci } });
+    } else {
+        res.render("competitions/rezultati", { result: { database_error: true } });
+    }
+
+    const result = schema_id.validate(req.params.id);   
+
+    const stmt1 = db.prepare("DELETE FROM apply WHERE competition_id = ?");
+    const deleteApply = stmt1.run(req.params.id);
+
+    res.render("competitions/rezultati");     
 });
+
+// POST /competitions/deleteComp:id
+router.post("/deleteComp/:id", adminRequired, function (req, res, next) {
+        // do validation
+        const result = schema_id.validate(req.params);
+        if (result.error) {
+            throw new Error("Neispravan poziv");
+        }
+    
+        const stmt = db.prepare("DELETE FROM apply WHERE competition_id = ?");
+        const selectResult = stmt.run( req.params.competition_id);
+    
+        if (!selectResult) {
+            throw new Error("Neispravan poziv");
+        }
+    
+        res.redirect("/competitions/rezultati");
+}); 
 
 // GET /competitions/ispis/:id
 router.get("/ispis/:id", function (req, res, next) {

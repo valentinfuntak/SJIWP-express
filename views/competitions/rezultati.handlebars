@@ -21,14 +21,14 @@
                 <td>{{this.date}}</td>
                 <td>{{this.points}}</td>
                 <td>
-                    <form method="post" action="/competitions/rezultat/{{this.id}}" class="flex flex-col gap-2">
+                    <form method="post" action="/competitions/rezultat/{{this.competition_id}}" class="flex flex-col gap-2">
 
                         <input type="text" name="bodovi" required="" minlength="1" maxlength="50"
                             value="{{this.points}}" class="input input-bordered flex flex-col gap-2"
                             placeholder="Unesite broj bodova" />
                         <input type="text" name="competition_id" required="" hidden="" minlength="1" maxlength="50"
                             value="{{this.competition_id }}" />
-
+                        
                         <input type="submit" value="Potvrdi" class="flex-1 btn btn-primary" />    
                         <a href="/competitions/deleteComp/{{this.competition_id}}" class="flex-1 btn bg-red-600">Ukloni natjecatelja</a>                    
                     </form>

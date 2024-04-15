@@ -28,6 +28,7 @@
                 result.edit}}value="{{result.edit.apply_till}}" {{/if}} />
         </div>
         {{#if result.edit}}
+        <label>CompId</label>
         <input type="hidden" name="competition_id" value="{{result.edit.id}}" />
         {{/if}}
         {{> form_buttons }}
@@ -80,6 +81,21 @@
                 <h2 class="card-title">Greška!</h2>
                 <p>
                     Već ste prijavljeni na ovo natjecanje!
+                </p>
+                <div class="card-actions justify-end">
+                    <a class="btn" href="/competitions">Nastavi na prikaz natjecanja</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
+    {{#if result.full}}
+    <div class="mt-4">
+        <div class="card w-96 bg-error text-primary-content">
+            <div class="card-body">
+                <h2 class="card-title">Greška!</h2>
+                <p>
+                    Prijavljen je maksimalan broj natjecatelja!
                 </p>
                 <div class="card-actions justify-end">
                     <a class="btn" href="/competitions">Nastavi na prikaz natjecanja</a>
