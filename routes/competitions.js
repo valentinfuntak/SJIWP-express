@@ -128,23 +128,20 @@ router.get("/apply/:id", function (req, res, next) {
     const stmt = db.prepare("SELECT * FROM apply WHERE user_id = ? AND competition_id = ?");
     const dbResult = stmt.get(req.user.sub, req.params.id);
 
-    if (dbResult) {
+     if (dbResult) {
         res.render("competitions/form", { result: { alreadySignedUp: true } });
     }
     else {
-        const stmt = db.prepare("INSERT INTO apply (user_id, competition_id) VALUES (?,?);");
-        const singUpResult = stmt.run(req.user.sub, req.params.id);
+        const stmt1 = db.prepare("INSERT INTO apply (user_id, competition_id) VALUES (?,?);");
+        const singUpResult = stmt1.run(req.user.sub, req.params.id);
 
-        const stmt1 = db.prepare(`UPDATE competitions SET cur_comp = cur_comp + 1;`);
-        const dbResult1 = stmt.run(req.user.sub, req.body.cur_comp); 
+        const stmt2 = db.prepare(`UPDATE competitions SET cur_comp = cur_comp + 1 WHERE id = ?`);
+        const dbResult1 = stmt2.run(req.params.id);
 
-        if (singUpResult.changes && singUpResult.changes === 1) {
-            res.render("competitions/form", { result: { signedUp: true } });
-        } else {
-            res.render("competitions/form", { result: { database_error: true } });
-        }
-    }
+        res.redirect("/competitions");
+    } 
 });
+
 
 // GET /competitions/rezultati/:id
 router.get("/rezultati/:id", function (req, res, next) {
@@ -190,14 +187,17 @@ router.post("/rezultat/:id", adminRequired, function (req, res, next) {
 
 // GET /competitions/deleteComp/:id
 router.get("/deleteComp/:id", adminRequired, function (req, res, next) {
+    
+
     const result = schema_id.validate(req.params.id);
 
     console.log("RQP", req.params.id);
 
     const stmt1 = db.prepare("DELETE FROM apply WHERE id = ? AND user_id = ?");
     const deleteApply = stmt1.run(req.params.id, req.user.sub);
-
+    
     console.log(deleteApply);
+
 
     const stmt2 = db.prepare(`UPDATE competitions SET cur_comp = cur_comp - 1 WHERE id = ?;`);
     const dbResult1 = stmt2.run(req.params.id);
@@ -207,7 +207,7 @@ router.get("/deleteComp/:id", adminRequired, function (req, res, next) {
     if (!deleteApply) {
         throw new Error("Neispravan poziv");
     }
-     res.render("competitions/rezultati"); 
+    res.render("competitions/rezultati");
 });
 
 
