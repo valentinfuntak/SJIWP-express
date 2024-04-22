@@ -167,4 +167,9 @@ router.post("/signup", function (req, res, next) {
   return;
 });
 
+// GET /users/inbox
+router.get("/inbox", function (req, res, next) {
+  res.render("users/inbox");
+});
+
 module.exports = router;

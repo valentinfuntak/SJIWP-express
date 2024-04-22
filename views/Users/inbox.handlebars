@@ -1,0 +1,13 @@
+<div class="inbox">
+    <h1>Ovo je inbox</h1>
+    <h1>{{title}}</h1>
+    <ul>
+        {{#each messages}}
+        <li>
+            <h2>{{subject}}</h2>
+            <p>{{content}}</p>
+            <span>From: {{sender}}</span>
+        </li>
+        {{/each}}
+    </ul>
+</div>
