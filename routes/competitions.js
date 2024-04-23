@@ -11,7 +11,7 @@ const { decode } = require("jsonwebtoken");
 // GET /competitions
 router.get("/", authRequired, function (req, res, next) {
     const stmt = db.prepare(`
-        SELECT c.id, c.name , c.description, c.max_comp, c.cur_comp, u.name AS author, c.apply_till
+        SELECT c.id, c.name , c.description, c.max_comp, c.cur_comp, c.num_questions, u.name AS author, c.apply_till
         FROM competitions c, users u
         WHERE c.author_id = u.id
         ORDER BY c.id 
@@ -72,7 +72,8 @@ const schema_edit = Joi.object({
     description: Joi.string().min(3).max(1000).required(),
     apply_till: Joi.date().iso().required(),
     max_comp: Joi.number().integer().min(1).required(),
-    cur_comp: Joi.number().integer().min(0).required()
+    cur_comp: Joi.number().integer().min(0).required(),
+    num_questions: Joi.number().integer().min(0).required()
 });
 
 // POST /competitions/edit/
@@ -83,8 +84,8 @@ router.post("/edit", adminRequired, function (req, res, next) {
         res.render("competitions/form", { result: { validation_error: true, display_form: true } });
         return;
     }
-    const stmt = db.prepare("UPDATE competitions SET name = ?, description = ?, max_comp = ?, cur_comp = ?, apply_till = ? WHERE id = ?");
-    const updateResult = stmt.run(req.body.name, req.body.description, req.body.max_comp, req.body.cur_comp, req.body.apply_till, req.body.competition_id);
+    const stmt = db.prepare("UPDATE competitions SET name = ?, description = ?, max_comp = ?, cur_comp = ?, apply_till = ?, num_questions WHERE id = ?");
+    const updateResult = stmt.run(req.body.name, req.body.description, req.body.max_comp, req.body.cur_comp, req.body.apply_till, req.body.num_questions, req.body.competition_id);
 });
 
 // GET /competitions/add
@@ -98,7 +99,8 @@ const schema_add = Joi.object({
     description: Joi.string().min(3).max(1000).required(),
     apply_till: Joi.date().iso().required(),
     max_comp: Joi.number().integer().min(1).required(),
-    cur_comp: Joi.number().integer().min(0).required()
+    cur_comp: Joi.number().integer().min(0).required(),
+    num_questions: Joi.number().integer().min(0).required()
 });
 // POST /competitions/add
 router.post("/add", adminRequired, function (req, res, next) {
@@ -109,8 +111,8 @@ router.post("/add", adminRequired, function (req, res, next) {
         return;
     }
 
-    const stmt = db.prepare("INSERT INTO competitions (name, description, author_id, apply_till, max_comp, cur_comp) VALUES (?, ?, ?, ?, ?, ?);");
-    const insertResult = stmt.run(req.body.name, req.body.description, req.user.sub, req.body.apply_till, req.body.max_comp, req.body.cur_comp);
+    const stmt = db.prepare("INSERT INTO competitions (name, description, author_id, apply_till, max_comp, cur_comp, num_questions) VALUES (?, ?, ?, ?, ?, ?, ?);");
+    const insertResult = stmt.run(req.body.name, req.body.description, req.user.sub, req.body.apply_till, req.body.max_comp, req.body.cur_comp, req.body.num_questions);
 
     if (insertResult.changes && insertResult.changes === 1) {
         res.render("competitions/form", { result: { success: true } });
@@ -229,5 +231,16 @@ router.get("/ispis/:id", function (req, res, next) {
 
 });
 
+// GET /competitions/questions/:id
+router.get("/questions/:id", authRequired, function (req, res, next) {
+    const stmt = db.prepare(`
+        SELECT a.competition_id, a.id, a.bodovi AS points, u.name AS nameUser, c.name AS nameCompetition, c.apply_till AS date
+        FROM users u, apply a, competitions c 
+        WHERE a.user_id = u.id AND a.competition_id = c.id AND c.id = ? 
+        ORDER BY bodovi DESC `);
+    const podaci = stmt.all(req.params.id);
+    
+    res.render("competitions/questions");
+});
 
 module.exports = router;
