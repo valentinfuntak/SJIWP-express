@@ -1899,6 +1899,14 @@ html {
   margin-bottom: 0.75rem;
 }
 
+.relative {
+  position: relative;
+}
+
+.right-7 {
+  right: 1.75rem;
+}
+
 .mt-4 {
   margin-top: 1rem;
 }
@@ -1950,12 +1958,20 @@ html {
   flex: none;
 }
 
+.flex-row-reverse {
+  flex-direction: row-reverse;
+}
+
 .flex-col {
   flex-direction: column;
 }
 
 .flex-wrap {
   flex-wrap: wrap;
+}
+
+.place-content-center {
+  place-content: center;
 }
 
 .items-baseline {

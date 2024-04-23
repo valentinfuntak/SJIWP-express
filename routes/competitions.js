@@ -239,8 +239,13 @@ router.get("/questions/:id", authRequired, function (req, res, next) {
         WHERE a.user_id = u.id AND a.competition_id = c.id AND c.id = ? 
         ORDER BY bodovi DESC `);
     const podaci = stmt.all(req.params.id);
-    
-    res.render("competitions/questions");
+    res.render("competitions/questions", {result: {items: podaci}});
 });
+
+// GET /competitions/add_questions/:id
+router.get("/add_questions/:id", authRequired, function (req, res, next) {
+    res.render("competitions/questions", {result: {items: podaci}});
+});
+
 
 module.exports = router;

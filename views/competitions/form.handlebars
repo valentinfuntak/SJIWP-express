@@ -27,12 +27,11 @@
             <input type="datetime-local" name="apply_till" class="bg-neutral" required="" minlength="1" {{#if
                 result.edit}}value="{{result.edit.apply_till}}" {{/if}} />
         </div>
-
         {{#if result.edit}}
         <label>CompId</label>
         <input type="hidden" name="competition_id" value="{{result.edit.id}}" />
         {{/if}}
-        {{> form_buttons}}
+        {{> form_buttons }}
     </form>
     {{/if}}
 
