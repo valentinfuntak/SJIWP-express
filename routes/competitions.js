@@ -101,7 +101,7 @@ const schema_add = Joi.object({
     max_comp: Joi.number().integer().min(1).required(),
     cur_comp: Joi.number().integer().min(0).required(),
     num_questions: Joi.number().integer().min(0).required()
-});
+}); 
 // POST /competitions/add
 router.post("/add", adminRequired, function (req, res, next) {
     // do validation
@@ -232,7 +232,7 @@ router.get("/ispis/:id", function (req, res, next) {
 });
 
 // GET /questions/:id
-router.get("/questions/:id", authRequired, function (req, res, next) {
+router.get("/questions", authRequired, function (req, res, next) {
     const stmt = db.prepare(`
         SELECT a.competition_id, a.id, a.bodovi AS points, u.name AS nameUser, c.name AS nameCompetition, c.apply_till AS date
         FROM users u, apply a, competitions c 
@@ -243,7 +243,7 @@ router.get("/questions/:id", authRequired, function (req, res, next) {
 });
 
 // GET /competitions/questions/dodajpitanje
-router.get("/competitions/questions/dodajpitanje", adminRequired, function (req, res, next) {
+router.get("/questions/dodajpitanje", adminRequired, function (req, res, next) {
     res.render("competitions/question_form", { result: { display_form_quest: true } });
 });
 
@@ -254,8 +254,8 @@ const schema_addQuest = Joi.object({
     Bodovi: Joi.number().integer().min(0).max(10).required(),
 });
 
-// POST /competitions/questions/add
-router.post("/competitions/addq", adminRequired, function (req, res, next) {
+/* // POST /competitions/questions/add
+router.post("", adminRequired, function (req, res, next) {
     // do validation
     const result = schema_add.validate(req.body);
     if (result.error) {
@@ -271,6 +271,6 @@ router.post("/competitions/addq", adminRequired, function (req, res, next) {
     } else {
         res.render("competitions/questions", { result: { database_error: true } });
     }
-}); 
+});  */
 
 module.exports = router;

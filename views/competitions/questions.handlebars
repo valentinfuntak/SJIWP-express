@@ -13,6 +13,7 @@
             <thead>
                 <tr>
                     <th>ID pitanja</th>
+                    <th>ID natjecanja</th>
                     <th>Pitanje</th>
                     <th>Tocan odgovor</th>
                     <th>Bodovi</th>
@@ -23,6 +24,7 @@
                 {{#each result.items}}
                 <tr>
                     <th>{{this.idquest}}</th>
+                    <td>{{this.competitionid}}</td>
                     <td>{{this.question}}</td>
                     <td>{{this.corr_ans}}</td>
                     <td>{{this.points}}</td>
