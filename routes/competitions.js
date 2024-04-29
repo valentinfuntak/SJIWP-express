@@ -130,7 +130,7 @@ router.get("/apply/:id", function (req, res, next) {
     const stmt = db.prepare("SELECT * FROM apply WHERE user_id = ? AND competition_id = ?");
     const dbResult = stmt.get(req.user.sub, req.params.id);
 
-     if (dbResult) {
+    if (dbResult) {
         res.render("competitions/form", { result: { alreadySignedUp: true } });
     }
     else {
@@ -141,7 +141,7 @@ router.get("/apply/:id", function (req, res, next) {
         const dbResult1 = stmt2.run(req.params.id);
 
         res.redirect("/competitions");
-    } 
+    }
 });
 
 
@@ -189,7 +189,7 @@ router.post("/rezultat/:id", adminRequired, function (req, res, next) {
 
 // GET /competitions/deleteComp/:id
 router.get("/deleteComp/:id", adminRequired, function (req, res, next) {
-    
+
 
     const result = schema_id.validate(req.params.id);
 
@@ -197,7 +197,7 @@ router.get("/deleteComp/:id", adminRequired, function (req, res, next) {
 
     const stmt1 = db.prepare("DELETE FROM apply WHERE id = ? AND user_id = ?");
     const deleteApply = stmt1.run(req.params.id, req.user.sub);
-    
+
     console.log(deleteApply);
 
 
@@ -231,21 +231,46 @@ router.get("/ispis/:id", function (req, res, next) {
 
 });
 
-// GET /competitions/questions/:id
+// GET /questions/:id
 router.get("/questions/:id", authRequired, function (req, res, next) {
     const stmt = db.prepare(`
         SELECT a.competition_id, a.id, a.bodovi AS points, u.name AS nameUser, c.name AS nameCompetition, c.apply_till AS date
         FROM users u, apply a, competitions c 
-        WHERE a.user_id = u.id AND a.competition_id = c.id AND c.id = ? 
-        ORDER BY bodovi DESC `);
+        WHERE a.user_id = u.id AND a.competition_id = c.id AND c.id = ?
+        ORDER BY bodovi DESC`);
     const podaci = stmt.all(req.params.id);
-    res.render("competitions/questions", {result: {items: podaci}});
+    res.render("competitions/questions", { result: { items: podaci } });
 });
 
-// GET /competitions/add_questions/:id
-router.get("/add_questions/:id", authRequired, function (req, res, next) {
-    res.render("competitions/questions", {result: {items: podaci}});
+// GET /competitions/questions/addq
+router.get("/competitions/questions/addq", adminRequired, function (req, res, next) {
+    res.render("competitions/questions_form", { result: { display_form_quest: true } });
 });
 
+// SCHEMA addQuest 
+const schema_addQuest = Joi.object({
+    Pitanje: Joi.string().min(3).max(50).required(),
+    TocanOdgovor: Joi.string().min(3).max(1000).required(),
+    Bodovi: Joi.number().integer().min(0).max(10).required(),
+});
+
+// POST /competitions/questions/add
+router.post("/competitions/addq", adminRequired, function (req, res, next) {
+    // do validation
+    const result = schema_add.validate(req.body);
+    if (result.error) {
+        res.render("competitions/form", { result: { validation_error: true, display_form_quest: true } });
+        return;
+    }
+
+    const stmt = db.prepare("INSERT INTO Questions (Pitanje, TocanOdgovor, Bodovi) VALUES (?, ?, ?);");
+    const insertResult = stmt.run(req.body.Pitanje, req.body.tocodg, req.body.bodovi);
+
+    if (insertResult.changes && insertResult.changes === 1) {
+        res.render("competitions/questions", { result: { success: true } });
+    } else {
+        res.render("competitions/questions", { result: { database_error: true } });
+    }
+}); 
 
 module.exports = router;

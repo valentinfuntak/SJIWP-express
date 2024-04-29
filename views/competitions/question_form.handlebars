@@ -1,0 +1,8 @@
+{{#if result.display_form_quest}}
+<form action="/competitions/add_question/{{this.id}}" method="POST">
+    <input class="bg-neutral" type="text" name="pitanje" placeholder="Pitanje" required>
+    <input class="bg-neutral" type="text" name="tocodg" placeholder="Točan odgovor" required>
+    <input class="bg-neutral" type="number" name="bodoiv" placeholder="Bodovi" required>
+    <button type="submit" class="mx-1 btn btn-right bg-yellow-500 btn-xl">Potvrdi</button>
+</form>
+{{/if}}
