@@ -242,9 +242,9 @@ router.get("/questions/:id", authRequired, function (req, res, next) {
     res.render("competitions/questions", { result: { items: podaci } });
 });
 
-// GET /competitions/questions/addq
-router.get("/competitions/questions/addq", adminRequired, function (req, res, next) {
-    res.render("competitions/questions_form", { result: { display_form_quest: true } });
+// GET /competitions/questions/dodajpitanje
+router.get("/competitions/questions/dodajpitanje", adminRequired, function (req, res, next) {
+    res.render("competitions/question_form", { result: { display_form_quest: true } });
 });
 
 // SCHEMA addQuest 
