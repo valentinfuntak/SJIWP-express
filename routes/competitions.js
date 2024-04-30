@@ -101,7 +101,7 @@ const schema_add = Joi.object({
     max_comp: Joi.number().integer().min(1).required(),
     cur_comp: Joi.number().integer().min(0).required(),
     num_questions: Joi.number().integer().min(0).required()
-}); 
+});
 // POST /competitions/add
 router.post("/add", adminRequired, function (req, res, next) {
     // do validation
@@ -234,9 +234,9 @@ router.get("/ispis/:id", function (req, res, next) {
 // GET /questions/:id
 router.get("/questions", authRequired, function (req, res, next) {
     const stmt = db.prepare(`
-        SELECT a.competition_id, a.id, a.bodovi AS points, u.name AS nameUser, c.name AS nameCompetition, c.apply_till AS date
-        FROM users u, apply a, competitions c 
-        WHERE a.user_id = u.id AND a.competition_id = c.id AND c.id = ?
+        SELECT a.competition_id, a.id, a.bodovi AS points, u.name AS nameUser, c.name AS nameCompetition, q.id_question, q.question, q.correct_ans, q.points
+        FROM users u, apply a, competitions c, questions q 
+        WHERE a.user_id = u.id AND a.competition_id = c.id AND c.id = ? AND q.id_question = c.id
         ORDER BY bodovi DESC`);
     const podaci = stmt.all(req.params.id);
     res.render("competitions/questions", { result: { items: podaci } });
@@ -249,28 +249,44 @@ router.get("/questions/dodajpitanje", adminRequired, function (req, res, next) {
 
 // SCHEMA addQuest 
 const schema_addQuest = Joi.object({
-    Pitanje: Joi.string().min(3).max(50).required(),
-    TocanOdgovor: Joi.string().min(3).max(1000).required(),
-    Bodovi: Joi.number().integer().min(0).max(10).required(),
+    question: Joi.string().min(3).max(50).required(),
+    correct_ans: Joi.string().min(3).max(1000).required(),
+    points: Joi.number().integer().min(0).max(10).required(),
 });
 
-/* // POST /competitions/questions/add
-router.post("", adminRequired, function (req, res, next) {
+// POST /competitions/questions/dodajpitanje
+router.post("/questions/dodajpitanje", adminRequired, function (req, res, next) {
     // do validation
-    const result = schema_add.validate(req.body);
+    const result = schema_addQuest.validate(req.body);
     if (result.error) {
-        res.render("competitions/form", { result: { validation_error: true, display_form_quest: true } });
+        res.render("competitions/question_form", { result: { validation_error: true, display_form_quest: true } });
         return;
     }
 
-    const stmt = db.prepare("INSERT INTO Questions (Pitanje, TocanOdgovor, Bodovi) VALUES (?, ?, ?);");
-    const insertResult = stmt.run(req.body.Pitanje, req.body.tocodg, req.body.bodovi);
+    const stmt = db.prepare("INSERT INTO questions (question, correct_ans, points) VALUES (?, ?, ?);");
+    const insertResult = stmt.all(req.body.Pitanje, req.body.tocanodg, req.body.bodovi);
 
     if (insertResult.changes && insertResult.changes === 1) {
-        res.render("competitions/questions", { result: { success: true } });
+        res.render("competitions/question_form", { result: { success: true } });
     } else {
-        res.render("competitions/questions", { result: { database_error: true } });
+        res.render("competitions/question_form", { result: { database_error: true } });
     }
-});  */
+});
+
+// GET /competitions/questions/uklonipitanje
+router.get("/questions/uklonipitanje/:id", adminRequired, function (req, res, next) {
+
+    const result = schema_id.validate(req.params.id);
+
+    const stmt1 = db.prepare("DELETE FROM questions WHERE id_question = ? AND id_competition = ?");
+    const deleteApply = stmt1.run(req.params.id, req.user.sub);
+
+    console.log(dbResult1);
+
+    if (!deleteApply) {
+        throw new Error("Neispravan poziv");
+    }
+    res.render("competitions/questions");
+});
 
 module.exports = router;

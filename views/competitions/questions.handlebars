@@ -1,11 +1,7 @@
 <div class="overflow-x-auto">
-    <div style="display: flex; justify-content: center; font-size: 40px;">Pitanja iz natjecanja: </div>
-    <div style="display: flex; justify-content: center; font-size: 30px;">
-        {{this.result.items.[0].nameCompetition}}
-    </div>
+    <div style="display: flex; justify-content: center; font-size: 50px;">Pitanja iz natjecanja: prikazati naziv natjecanja {{this.result.items.[0].nameCompetition}}</div>
     {{#if user.is_admin }}
     <a href="/competitions/questions/dodajpitanje" class="mx-1 btn btn-right bg-green-600 btn-xl">Dodaj pitanje</a>
-    <a href="/competitions/questions/dodajpitanje" class="mx-1 btn btn-right bg-red-500 btn-xl">Ukloni pitanje</a>
     {{/if}}
 
     <div class="overflow-x-auto">
@@ -18,17 +14,23 @@
                     <th>Pitanje</th>
                     <th>Tocan odgovor</th>
                     <th>Bodovi</th>
+                    <th>Mogučnosti</th>
                 </tr>
             </thead>
             <!-- body -->
             <tbody>
                 {{#each result.items}}
                 <tr>
-                    <th>{{this.idquest}}</th>
-                    <td>{{this.competitionid}}</td>
+                    <th>{{this.id_question}}</th>
+                    <td>{{this.competition_id}}</td>
                     <td>{{this.question}}</td>
-                    <td>{{this.corr_ans}}</td>
+                    <td>{{this.correct_ans}}</td>
                     <td>{{this.points}}</td>
+                    <td>
+                        {{#if user.is_admin }}
+                        <a href="/competitions/questions/uklonipitanje"class="mx-1 btn btn-right bg-red-500 btn-xl">Ukloni pitanje</a>
+                        {{/if}}
+                    </td>
                 </tr>
                 {{/each}}
             </tbody>

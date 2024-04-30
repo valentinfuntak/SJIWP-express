@@ -1,9 +1,9 @@
 {{#if result.display_form_quest}}
-<div style="display: flex; justify-content: center; font-size: 40px;">Unos pitanja: </div>
-<form class="flex-col mx-1 pb-2 flex gap-2" action="/competitions/add_question/{{this.id}}" method="POST">
-    <input class="bg-neutral" type="text" name="pitanje" placeholder="Pitanje" required>
-    <input class="bg-neutral" type="text" name="tocodg" placeholder="Točan odgovor" required>
-    <input class="bg-neutral" type="number" name="bodoiv" placeholder="Bodovi" required>
+<div style="display: flex; justify-content: center; font-size: 50px;"> UNOS PITANJA </div>
+<form class="flex-col mx-1 pb-2 flex gap-2" method="post" action="/competitions/questions/dodajpitanje">
+    <input class="bg-neutral" type="text" name="pitanje" placeholder="Pitanje" required="" /required>
+    <input class="bg-neutral" type="text" name="tocanodg" placeholder="Točan odgovor" required="" /required>
+    <input class="bg-neutral" type="number" name="bodovi" placeholder="Bodovi" required=""/>
+    {{> form_buttons }}
 </form>
-{{> form_buttons }}
 {{/if}}
